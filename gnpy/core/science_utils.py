@@ -630,7 +630,6 @@ class NliSolver:
 
         dispersion_tolerance = sim_params.nli_params.dispersion_tolerance
         phase_shift_tolerance = sim_params.nli_params.phase_shift_tolerance
-        max_slot_width = max(slot_width)
         max_beta2 = max(abs(beta2))
         delta_z = sim_params.raman_params.result_spatial_resolution
 
@@ -648,10 +647,11 @@ class NliSolver:
             cut_roll_off = roll_off[cut_index]
             cut_beta2 = beta2[cut_index]
             cut_alpha = alpha[cut_index]
+            cut_slot_width = slot_width[cut_index]
             k_tol = dispersion_tolerance * abs(cut_alpha)
             phi_tol = phase_shift_tolerance / delta_z
-            f_cut_resolution = min(k_tol, phi_tol) / abs(max_beta2) / (4 * pi ** 2 * (1 + dn) * max_slot_width)
-            f_pump_resolution = min(k_tol, phi_tol) / abs(max_beta2) / (4 * pi ** 2 * max_slot_width)
+            f_cut_resolution = min(k_tol, phi_tol) / abs(max_beta2) / (4 * pi ** 2 * (1 + dn) * cut_slot_width)
+            f_pump_resolution = min(k_tol, phi_tol) / abs(max_beta2) / (4 * pi ** 2 * cut_slot_width)
             psi[cut_index, cut_index] = NliSolver._generalized_psi(cut_frequency, cut_frequency, cut_baud_rate,
                                                                    cut_roll_off, cut_frequency, cut_baud_rate,
                                                                    cut_roll_off, f_cut_resolution, f_pump_resolution,
