@@ -30,7 +30,7 @@ except ImportError:
             return func
         return decorator
 
-from numpy import zeros, cos, pi, abs, outer, ones, log, sqrt, reshape, swapaxes, sum as np_sum
+from numpy import zeros, cos, pi, abs, outer, ones, log, sqrt, reshape, swapaxes, sum as np_sum, exp
 
 
 # ============================================================================
@@ -132,6 +132,8 @@ def _approx_psi_leff_computation_numba(loss_profile, delta_z, z_size):
             pump_alpha[i, j] = (loss_lin[i, j + 1] - loss_lin[i, j]) / delta_z[j]
     
     # Compute leff
+    # Original: leff = abs((loss_profile[:, 1:] - loss_profile[:, :-1]) / sqrt(abs(pump_alpha))) * pump_alpha / abs(pump_alpha)
+    # Note: Small numerical differences (~1e-10) vs NumPy are normal due to FMA instructions and optimization
     leff = zeros((nfreq, n_segments))
     for i in range(nfreq):
         for j in range(n_segments):
@@ -325,12 +327,6 @@ def _generalized_psi_inner_loop_numba(f1_array, f2_array, rc1, f_eval,
     # Precalculate raised cosine for f2 (it's the same for all i)
     rc2 = raised_cosine_numba(f2_array, cut_frequency, cut_baud_rate, cut_roll_off)
     
-    # Precompute complex exponentials for z array to avoid repeated calculations
-    z_first = z[0]
-    z_last = z[-1]
-    rho_first_sq = rho_pump[0]**2
-    rho_last_sq = rho_pump[-1]**2
-    
     for i in range(f1_array.size):
         f1 = f1_array[i]
         
@@ -346,26 +342,25 @@ def _generalized_psi_inner_loop_numba(f1_array, f2_array, rc1, f_eval,
             delta_beta = 4.0 * pi**2 * (f1 - f_eval) * (f2_array[j] - f_eval) * \
                          (beta2 + pi * beta3 * (f1 + f2_array[j] - 2.0 * f_ref_beta))
             
-            # Compute generalized_rho_nli inline for better performance
+            # Compute generalized_rho_nli - CORRECTED VERSION
+            # This matches the original implementation in science_utils.py lines 621-628
             w = 1j * delta_beta - alpha
             w_abs = abs(w)
             
             if w_abs > 1e-10:
-                # Compute exp(w * z) using Euler's formula: e^(ix) = cos(x) + i*sin(x)
-                # For complex w = a + ib: exp(w*z) = exp(a*z) * (cos(b*z) + i*sin(b*z))
-                w_real = w.real
-                w_imag = w.imag
+                # Initial term (boundary conditions)
+                generalized_rho = (rho_pump[-1]**2 * exp(w * z[-1]) - 
+                                 rho_pump[0]**2 * exp(w * z[0])) / w
                 
-                # exp(w * z_last)
-                exp_wr_last = cos(w_real * z_last) + 1j * (w_real * z_last) if abs(w_real * z_last) < 1e-3 else \
-                              (cos(w_real * z_last) + 1j *  (w_imag * z_last))
-                # exp(w * z_first) 
-                exp_wr_first = cos(w_real * z_first) + 1j * (w_real * z_first) if abs(w_real * z_first) < 1e-3 else \
-                               (cos(w_real * z_first) + 1j * (w_imag * z_first))
+                # Derivative loop - THIS WAS MISSING!
+                for z_ind in range(len(z) - 1):
+                    derivative_rho = (rho_pump[z_ind + 1]**2 - rho_pump[z_ind]**2) / \
+                                    (z[z_ind + 1] - z[z_ind])
+                    generalized_rho -= derivative_rho * \
+                                      (exp(w * z[z_ind + 1]) - exp(w * z[z_ind])) / (w**2)
                 
-                # Simplified calculation (boundary terms only)
-                gen_rho = (rho_last_sq - rho_first_sq) / w
-                rho_nli = (gen_rho.real**2 + gen_rho.imag**2)  # abs(gen_rho)**2
+                # Return absolute value squared
+                rho_nli = (generalized_rho.real**2 + generalized_rho.imag**2)
             else:
                 rho_nli = 0.0
             
