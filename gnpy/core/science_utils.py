@@ -15,12 +15,10 @@ Solver definitions to calculate the Raman effect and the nonlinear interference 
 The solvers take as input instances of the spectral information, the fiber and the simulation parameters
 """
 
-from numpy import interp, pi, zeros, cos, array, append, ones, exp, arange, sqrt, trapz, arcsinh, clip, abs, sum, \
-    concatenate, flip, outer, inner, transpose, max, format_float_scientific, diag, sort, unique, argsort, cumprod, \
-    polyfit, log, reshape, swapaxes, full, nan, cumsum
+from numpy import interp, pi, zeros, cos, array, append, ones, exp, arange, sqrt, trapz, arcsinh, clip, abs, sum, concatenate, flip, outer, inner, transpose, max, format_float_scientific, diag, sort, unique, argsort, cumprod, polyfit, log, reshape, swapaxes, full, nan, cumsum #type: ignore
 from logging import getLogger
-from scipy.constants import k, h
-from scipy.interpolate import interp1d
+from scipy.constants import k, h  #type: ignore
+from scipy.interpolate import interp1d #type: ignore
 from math import isclose, factorial
 
 from gnpy.core.utils import db2lin, lin2db
@@ -34,7 +32,6 @@ try:
         is_numba_available,
         raised_cosine_numba,
         _approx_psi_leff_computation_numba,
-        _generalized_rho_nli_numba,
         _generalized_psi_inner_loop_numba
     )
     USE_NUMBA = is_numba_available()
@@ -58,7 +55,7 @@ def raised_cosine(frequency, channel_frequency, channel_baud_rate, channel_roll_
     """
     # Use Numba-optimized version if available for ~5-20x speedup
     if USE_NUMBA:
-        return raised_cosine_numba(frequency, channel_frequency, channel_baud_rate, channel_roll_off)
+        return raised_cosine_numba(frequency, channel_frequency, channel_baud_rate, channel_roll_off) #type: ignore
     
     # Original implementation (fallback when Numba is not available)
     raised_cosine_mask = zeros(frequency.size)
@@ -265,21 +262,21 @@ class RamanSolver:
                         gamma1 = sum(crpz * eff_length, 1)
                         exponent += gamma1
                     if sim_params.raman_params.order >= 2:
-                        z_integrand = expz * gamma1
+                        z_integrand = expz * gamma1 #type: ignore
                         z_integral = cumsum((z_integrand[:, :-1] + z_integrand[:, 1:]) / 2 * dz, 1)
-                        gamma2 = zeros(gamma1.shape)
+                        gamma2 = zeros(gamma1.shape) #type: ignore
                         gamma2[:, 1:] = sum(crpz[:, :, 1:] * z_integral, 1)
                         exponent += gamma2
                     if sim_params.raman_params.order >= 3:
-                        z_integrand = expz * (gamma2 + 1/2 * gamma1**2)
+                        z_integrand = expz * (gamma2 + 1/2 * gamma1**2) #type: ignore
                         z_integral = cumsum((z_integrand[:, :-1] + z_integrand[:, 1:]) / 2 * dz, 1)
-                        gamma3 = zeros(gamma1.shape)
+                        gamma3 = zeros(gamma1.shape) #type: ignore
                         gamma3[:, 1:] = sum(crpz[:, :, 1:] * z_integral, 1)
                         exponent += gamma3
                     if sim_params.raman_params.order >= 4:
-                        z_integrand = expz * (gamma3 + gamma1 * gamma2 + 1/factorial(3) * gamma1**3)
+                        z_integrand = expz * (gamma3 + gamma1 * gamma2 + 1/factorial(3) * gamma1**3) #type: ignore
                         z_integral = cumsum((z_integrand[:, :-1] + z_integrand[:, 1:]) / 2 * dz, 1)
-                        gamma4 = zeros(gamma1.shape)
+                        gamma4 = zeros(gamma1.shape) #type: ignore
                         gamma4[:, 1:] = sum(crpz[:, :, 1:] * z_integral, 1)
                         exponent += gamma4
                     power_interval *= exp(exponent)
@@ -596,7 +593,7 @@ class NliSolver:
 
         # Use Numba-optimized version if available for ~20-50x speedup
         if USE_NUMBA:
-            integrand_f1 = _generalized_psi_inner_loop_numba(
+            integrand_f1 = _generalized_psi_inner_loop_numba( #type: ignore
                 f1_array, f2_array, rc1, f_eval,
                 cut_frequency, cut_baud_rate, cut_roll_off,
                 pump_frequency, pump_baud_rate, pump_roll_off,
@@ -710,14 +707,14 @@ class NliSolver:
         # Use Numba-optimized version for the computationally intensive leff calculation
         # This can provide 50-100x speedup
         if USE_NUMBA:
-            leff2 = _approx_psi_leff_computation_numba(loss_profile, delta_z, z.size)
+            leff2 = _approx_psi_leff_computation_numba(loss_profile, delta_z, z.size) #type: ignore
             z_int = outer(ones(frequency.size), leff2)
         else:
             # Original implementation (fallback when Numba is not available)
             loss_lin = log(loss_profile)
             pump_alpha = (loss_lin[:, 1:] - loss_lin[:, :-1]) / delta_z
             leff = abs((loss_profile[:, 1:] - loss_profile[:, :-1]) / sqrt(abs(pump_alpha))) * pump_alpha / abs(pump_alpha)
-            leff = reshape(outer(leff, ones(z.size - 1)), newshape=[leff.shape[0], leff.shape[1], leff.shape[1]])
+            leff = reshape(outer(leff, ones(z.size - 1)), newshape=[leff.shape[0], leff.shape[1], leff.shape[1]]) #type: ignore
             leff2 = leff * swapaxes(leff, 2, 1)
             leff2 = sum(leff2, axis=(1, 2))
             z_int = outer(ones(frequency.size), leff2)
