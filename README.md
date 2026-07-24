@@ -1,5 +1,15 @@
 # GNPy: Optical Route Planning and DWDM Network Optimization
 
+> **⚠️ AVISO DE FORK (Versão de Tese):** 
+> Esta versão do GNPy é um fork independente do repositório upstream (oficial) criado exclusivamente para fins acadêmicos e para a tese de Matheus Lôbo dos Santos. 
+> 
+> **Principais Modificações:**
+> Foi introduzida aceleração via JIT (Just-In-Time) compiler através da biblioteca **Numba** para acelerar substancialmente o cálculo pesado de NLI e "generalized psi" no módulo `gnpy.core.science_utils` (e funções auxiliares em `gnpy.core.numba_optimizations`).
+> 
+> **Instalação e Uso:**
+> Para usar com a aceleração, instale com suporte a performance: `pip install .[performance]`. Caso o Numba não esteja presente, o sistema fará um *fallback* automático para o código puro em NumPy.
+> *Nota:* Scripts de demonstração específicos, como `examples/test_numba_integration.py` e `numba_performance_demo.py`, não fazem parte da suíte oficial de testes e devem ser executados manualmente.
+
 [![Install via pip](https://img.shields.io/pypi/v/gnpy)](https://pypi.org/project/gnpy/)
 [![Python versions](https://img.shields.io/pypi/pyversions/gnpy)](https://pypi.org/project/gnpy/)
 [![Documentation status](https://readthedocs.org/projects/gnpy/badge/?version=master)](http://gnpy.readthedocs.io/en/master/?badge=master)
