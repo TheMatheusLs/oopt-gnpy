@@ -1,0 +1,74 @@
+# How to cite this fork.
+#
+# Two blocks, two purposes:
+#   - the top level describes THIS SOFTWARE (the fork), and is what Zenodo and
+#     GitHub's "Cite this repository" button read;
+#   - `preferred-citation` names the PAPER that should be cited in the text of a
+#     publication, which is the conventional academic credit.
+#
+# TODO: add `doi:` below once the Zenodo deposit exists (10.5281/zenodo.XXXXXXX),
+# and `orcid:` entries if the authors have them.
+cff-version: 1.2.0
+message: >-
+  If you use this fork, please cite the software entry below and the conference
+  paper under `preferred-citation`. Please also cite upstream GNPy
+  (doi:10.5281/zenodo.3458319), of which this is a derivative work.
+title: "Accelerated GNPy fork with JIT-compiled NLI routines"
+abstract: >-
+  Fork of GNPy branched from upstream tag v2.13, in which three CPU-bound routines
+  of the nonlinear-interference computation are reimplemented with Numba just-in-time
+  compilation, leaving the mathematical expressions and physical models unchanged.
+  Numerical equivalence with upstream was verified over 30,606 independent WDM and
+  EON scenarios, with a maximum relative error of 2.23e-15. Two upstream failure
+  modes are also removed: a division by zero for ideal filters and silent NaN
+  propagation for vanishing attenuation or dispersion.
+type: software
+version: 3.0.0+thesis
+date-released: "2026-07-24"
+license: BSD-3-Clause
+repository-code: "https://github.com/TheMatheusLs/oopt-gnpy"
+keywords:
+  - elastic optical networks
+  - multiband transmission
+  - quality of transmission
+  - GSNR
+  - GNPy
+  - just-in-time compilation
+authors:
+  - given-names: "Matheus L."
+    family-names: "Santos"
+    affiliation: "Federal University of Pernambuco, Recife, Brazil"
+    email: "matheus.lobo@ufpe.br"
+
+# O software é derivado do GNPy upstream; a atribuição fica explícita aqui.
+references:
+  - type: software
+    title: "GNPy: Optical Route Planning and DWDM Network Optimization"
+    doi: "10.5281/zenodo.3458319"
+    repository-code: "https://github.com/Telecominfraproject/oopt-gnpy"
+    license: BSD-3-Clause
+    authors:
+      - name: "Telecom Infra Project and GNPy contributors"
+
+preferred-citation:
+  type: conference-paper
+  title: >-
+    A Tabulated GSNR Framework for Tractable QoT-Aware RSA in C+L+S Elastic
+    Optical Networks
+  collection-title: >-
+    IEEE Latin-American Conference on Communications (LATINCOM)
+  year: 2026
+  authors:
+    - given-names: "Matheus L."
+      family-names: "Santos"
+      affiliation: "Federal University of Pernambuco, Recife, Brazil"
+    - given-names: "Karcius D. R."
+      family-names: "Assis"
+      affiliation: "Federal University of Bahia, Salvador, Brazil"
+    - given-names: "Joaquim F."
+      family-names: "Martins-Filho"
+      affiliation: "Federal University of Pernambuco, Recife, Brazil"
+    - given-names: "Raul C."
+      family-names: "Almeida"
+      name-suffix: "Jr."
+      affiliation: "Federal University of Pernambuco, Recife, Brazil"

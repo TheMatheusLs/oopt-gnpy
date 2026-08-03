@@ -1,14 +1,63 @@
 # GNPy: Optical Route Planning and DWDM Network Optimization
 
-> **⚠️ AVISO DE FORK (Versão de Tese):** 
-> Esta versão do GNPy é um fork independente do repositório upstream (oficial) criado exclusivamente para fins acadêmicos e para a tese de Matheus Lôbo dos Santos. 
-> 
-> **Principais Modificações:**
-> Foi introduzida aceleração via JIT (Just-In-Time) compiler através da biblioteca **Numba** para acelerar substancialmente o cálculo pesado de NLI e "generalized psi" no módulo `gnpy.core.science_utils` (e funções auxiliares em `gnpy.core.numba_optimizations`).
-> 
-> **Instalação e Uso:**
-> Para usar com a aceleração, instale com suporte a performance: `pip install .[performance]`. Caso o Numba não esteja presente, o sistema fará um *fallback* automático para o código puro em NumPy.
-> *Nota:* Scripts de demonstração específicos, como `examples/test_numba_integration.py` e `numba_performance_demo.py`, não fazem parte da suíte oficial de testes e devem ser executados manualmente.
+> ## ⚠️ Academic fork — this is not the official GNPy
+>
+> This repository is an independent fork of
+> [Telecominfraproject/oopt-gnpy](https://github.com/Telecominfraproject/oopt-gnpy),
+> branched from upstream tag **`v2.13`** and released here as **`v3.0.0+thesis`**.
+> It is maintained for the doctoral research of Matheus Lôbo dos Santos
+> (Federal University of Pernambuco, Brazil) and is **not endorsed by the Telecom
+> Infra Project**. For production use, go upstream.
+>
+> ### What changed
+>
+> Three CPU-bound routines of the nonlinear-interference (NLI) computation in
+> `gnpy.core.science_utils` were reimplemented with [Numba](https://numba.pydata.org/)
+> just-in-time compilation. The mathematical expressions and the physical models are
+> untouched — the changes are to memory traffic and loop structure only. The compiled
+> kernels live in the new module `gnpy.core.numba_optimizations`:
+>
+> | Kernel | Change |
+> |---|---|
+> | `_approx_psi_leff_computation_numba` | effective length reorganized algebraically from `O(N²)` to `O(N)`, which also removes the intermediate matrices that only held partial results |
+> | `scalar_raised_cosine`, `raised_cosine_numba` | raised-cosine pulse shaping evaluated as a compiled scalar inside the integration loop, instead of rebuilding NumPy temporaries at every step |
+> | `_generalized_psi_inner_loop_numba` | generalized Ψ kernel restructured to reuse preallocated buffers, with an explicit trapezoidal rule for non-uniform frequency spacing replacing the general-purpose quadrature |
+>
+> Two upstream failure modes are also removed: a division by zero for ideal filters
+> (roll-off equal to zero) and silent NaN propagation in the limiting cases of vanishing
+> attenuation or dispersion. In both limits this fork converges to the correct analytical
+> limit of the GGN approximation.
+>
+> ### Numerical equivalence
+>
+> Verified against the upstream implementation over **30,606 independent scenarios**
+> spanning WDM and EON transmission in the L, C and S bands, under a pre-emphasis profile
+> with central launch powers of −1, 0 and +1 dBm:
+>
+> - maximum relative error **2.23 × 10⁻¹⁵**
+> - maximum absolute GSNR difference **1.07 × 10⁻¹⁴ dB**
+>
+> Both are at the level of floating-point rounding. Measured speedups: **2.58× to 2.82×**
+> for the multiband EON scenarios and **5.32×** for the reference WDM case.
+>
+> ### Install
+>
+> ```
+> pip install .[performance]
+> ```
+>
+> enables the acceleration. Without Numba the code falls back automatically to the pure
+> NumPy path, so results are unchanged and only the runtime differs.
+>
+> `examples/numba_performance_demo.py`, `examples/test_numba_integration.py` and
+> `examples/test_generalized_psi_optimization.py` are demonstration scripts, not part of
+> the official test suite — run them manually.
+>
+> ### Citing
+>
+> If you use this fork, cite it as described in [`CITATION.cff`](CITATION.cff). Please also
+> cite upstream GNPy — [doi:10.5281/zenodo.3458319](https://doi.org/10.5281/zenodo.3458319)
+> — since everything here is a derivative work of it.
 
 [![Install via pip](https://img.shields.io/pypi/v/gnpy)](https://pypi.org/project/gnpy/)
 [![Python versions](https://img.shields.io/pypi/pyversions/gnpy)](https://pypi.org/project/gnpy/)
