@@ -6,8 +6,9 @@
 #   - `preferred-citation` names the PAPER that should be cited in the text of a
 #     publication, which is the conventional academic credit.
 #
-# TODO: add `doi:` below once the Zenodo deposit exists (10.5281/zenodo.XXXXXXX),
-# and `orcid:` entries if the authors have them.
+# `doi` below is the VERSION DOI of v3.0.0+thesis, not the concept DOI
+# (10.5281/zenodo.21774609), so that a citation always resolves to this exact
+# snapshot.
 cff-version: 1.2.0
 message: >-
   If you use this fork, please cite the software entry below and the conference
@@ -24,7 +25,8 @@ abstract: >-
   propagation for vanishing attenuation or dispersion.
 type: software
 version: 3.0.0+thesis
-date-released: "2026-07-24"
+doi: "10.5281/zenodo.21774610"
+date-released: "2026-08-03"
 license: BSD-3-Clause
 repository-code: "https://github.com/TheMatheusLs/oopt-gnpy"
 keywords:
@@ -37,14 +39,19 @@ keywords:
 authors:
   - given-names: "Matheus L."
     family-names: "Santos"
+    orcid: "https://orcid.org/0000-0002-8331-1087"
     affiliation: "Federal University of Pernambuco, Recife, Brazil"
     email: "matheus.lobo@ufpe.br"
 
 # O software é derivado do GNPy upstream; a atribuição fica explícita aqui.
+# O DOI abaixo é o da VERSÃO v2.13, que é a base real do fork. O concept DOI do
+# GNPy (10.5281/zenodo.3458319) resolve sempre para a release mais recente e
+# hoje aponta para a v2.14.1, publicada depois deste fork.
 references:
   - type: software
     title: "GNPy: Optical Route Planning and DWDM Network Optimization"
-    doi: "10.5281/zenodo.3458319"
+    version: "v2.13"
+    doi: "10.5281/zenodo.17207373"
     repository-code: "https://github.com/Telecominfraproject/oopt-gnpy"
     license: BSD-3-Clause
     authors:
@@ -61,6 +68,7 @@ preferred-citation:
   authors:
     - given-names: "Matheus L."
       family-names: "Santos"
+      orcid: "https://orcid.org/0000-0002-8331-1087"
       affiliation: "Federal University of Pernambuco, Recife, Brazil"
     - given-names: "Karcius D. R."
       family-names: "Assis"

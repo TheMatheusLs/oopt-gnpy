@@ -55,9 +55,17 @@
 >
 > ### Citing
 >
-> If you use this fork, cite it as described in [`CITATION.cff`](CITATION.cff). Please also
-> cite upstream GNPy — [doi:10.5281/zenodo.3458319](https://doi.org/10.5281/zenodo.3458319)
-> — since everything here is a derivative work of it.
+> [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21774610.svg)](https://doi.org/10.5281/zenodo.21774610)
+>
+> This release is archived on Zenodo as
+> [doi:10.5281/zenodo.21774610](https://doi.org/10.5281/zenodo.21774610). Cite that DOI —
+> it is the *version* DOI and always resolves to this exact snapshot, which is what a
+> reproducibility claim needs. See [`CITATION.cff`](CITATION.cff) for the full entry and
+> for the paper to cite alongside it.
+>
+> Please also cite upstream GNPy —
+> [doi:10.5281/zenodo.3458319](https://doi.org/10.5281/zenodo.3458319) — since everything
+> here is a derivative work of it.
 
 [![Install via pip](https://img.shields.io/pypi/v/gnpy)](https://pypi.org/project/gnpy/)
 [![Python versions](https://img.shields.io/pypi/pyversions/gnpy)](https://pypi.org/project/gnpy/)
